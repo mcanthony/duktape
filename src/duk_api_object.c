@@ -490,6 +490,54 @@ DUK_EXTERNAL void duk_put_number_list(duk_context *ctx, duk_idx_t obj_index, con
 	}
 }
 
+DUK_EXTERNAL void duk_put_prop_list(duk_context *ctx, duk_idx_t obj_index, const duk_prop_list_entry *props) {
+	const duk_prop_list_entry *ent = props;
+
+	DUK_ASSERT_CTX_VALID(ctx);
+
+	obj_index = duk_require_normalize_index(ctx, obj_index);
+	for (;;) {
+		switch (ent->etype) {
+		case DUK_PROP_TYPE_END:
+			return;
+		case DUK_PROP_TYPE_NUMBER:
+			duk_push_number(ctx, ent->u.num);
+			break;
+		case DUK_PROP_TYPE_STRING:
+			duk_push_string(ctx, ent->u.str);
+			break;
+		default:
+			DUK_ERROR((duk_hthread *) ctx, DUK_ERR_INTERNAL_ERROR, "FIXME: error string");
+		}
+		duk_put_prop_string(ctx, obj_index, ent->key);
+		ent++;
+	}
+	DUK_UNREACHABLE();
+}
+
+#if 1  /* FIXME: condition */
+DUK_EXTERNAL duk_prop_list_entry duk_proplist_make_end(void) {
+	duk_prop_list_entry ret;
+	ret.etype = DUK_PROP_TYPE_END;
+	return ret;
+}
+DUK_EXTERNAL duk_prop_list_entry duk_proplist_make_number(const char *keyval, duk_double_t numval) {
+	duk_prop_list_entry ret;
+	ret.etype = DUK_PROP_TYPE_NUMBER;
+	ret.key = keyval;
+	ret.u.num = numval;
+	return ret;
+}
+DUK_EXTERNAL duk_prop_list_entry duk_proplist_make_string(const char *keyval, const char *strval) {
+	duk_prop_list_entry ret;
+	ret.etype = DUK_PROP_TYPE_STRING;
+	ret.key = keyval;
+	ret.u.str = strval;
+	return ret;
+}
+#endif
+
+
 /*
  *  Shortcut for accessing global object properties
  */
