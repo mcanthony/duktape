@@ -2834,6 +2834,28 @@ directly with dvalues, so that when C code does a::
 an arbitrarily complex object value (perhaps even an arbitrary object graph)
 can be decoded and pushed to the value stack.
 
+Heap walking support
+--------------------
+
+One option for structured value support is to add support for walking of
+heap objects: the debug client could read heap objects directly, get their
+type and properties, read off further object references, etc.
+
+The basic problem with this approach is pointer safety: if any values
+referenced by the client have already been freed, memory unsafe behavior
+results.  This is quite easy to trigger for e.g. Eval results (which
+become unreachable right after Eval is complete).
+
+A simple workaround would be to prevent mark-and-sweep and refzero queue
+freeing while the debugger message loop was active (or only when debugger
+is paused).  This would make heap walking safe while the target was paused,
+even for objects with a zero refcount, but would have the downside that one
+might run out of memory e.g. when executing complex Eval commands while
+paused.
+
+A variant of this workaround is to require the debug client to explicitly
+control GC freezing through "enable walking" and "disable walking" commands.
+
 Heap dump viewer
 ----------------
 
