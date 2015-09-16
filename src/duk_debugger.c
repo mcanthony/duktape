@@ -29,6 +29,8 @@ typedef union {
 	} while (0)
 
 DUK_INTERNAL void duk_debug_do_detach(duk_heap *heap) {
+	duk_debug_detached_function detach_cb;
+
 	/* Can be called muliple times with no harm. */
 
 	heap->dbg_read_cb = NULL;
@@ -36,9 +38,7 @@ DUK_INTERNAL void duk_debug_do_detach(duk_heap *heap) {
 	heap->dbg_peek_cb = NULL;
 	heap->dbg_read_flush_cb = NULL;
 	heap->dbg_write_flush_cb = NULL;
-	if (heap->dbg_detached_cb) {
-		heap->dbg_detached_cb(heap->dbg_udata);
-	}
+	detach_cb = heap->dbg_detached_cb;
 	heap->dbg_detached_cb = NULL;
 	heap->dbg_udata = NULL;
 	heap->dbg_processing = 0;
@@ -58,6 +58,13 @@ DUK_INTERNAL void duk_debug_do_detach(duk_heap *heap) {
 	 * XXX: clear breakpoint on either attach or detach?
 	 */
 	heap->dbg_breakpoints_active[0] = (duk_breakpoint *) NULL;
+
+	/* Call the detached callback last, so that if it immediately
+	 * reattaches, the debugger state will be correct.
+	 */
+	if (detach_cb) {
+		detach_cb(heap->dbg_udata);
+	}
 }
 
 /*
