@@ -801,6 +801,7 @@ standard_reserved_words_list = [
 	mkstr("try", reserved_word=True),
 	mkstr("typeof", reserved_word=True),
 	mkstr("var", reserved_word=True),
+	mkstr("const", reserved_word=True),   # FIXME
 	mkstr("void", reserved_word=True),
 	mkstr("while", reserved_word=True),
 	mkstr("with", reserved_word=True),
@@ -808,7 +809,7 @@ standard_reserved_words_list = [
 	# Future reserved word
 
 	mkstr("class", reserved_word=True, future_reserved_word=True),
-	mkstr("const", reserved_word=True, future_reserved_word=True),
+#	mkstr("const", reserved_word=True, future_reserved_word=True),    # FIXME
 	mkstr("enum", reserved_word=True, future_reserved_word=True),
 	mkstr("export", reserved_word=True, future_reserved_word=True),
 	mkstr("extends", reserved_word=True, future_reserved_word=True),
