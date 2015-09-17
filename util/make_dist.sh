@@ -818,9 +818,17 @@ rm $DISTSRCSEP/caseconv.txt
 # preprocessor directives.  Whitespace and comments can be stripped as long
 # as the other requirements are met.
 
-python util/combine_src.py $DISTSRCSEP $DISTSRCCOM/duktape.c \
-	"$DUK_VERSION" "$GIT_COMMIT" "$GIT_DESCRIBE" "$GIT_BRANCH" \
-	$DIST/LICENSE.txt.tmp $DIST/AUTHORS.rst.tmp
+python util/combine_src.py \
+	--source-dir $DISTSRCSEP \
+	--output-source $DISTSRCCOM/duktape.c \
+	--output-metadata $DISTSRCCOM/metadata.json \
+	--duk-version "$DUK_VERSION" \
+	--git-commit "$GIT_COMMIT" \
+	--git-describe "$GIT_DESCRIBE" \
+	--git-branch "$GIT_BRANCH" \
+	--license-file $DIST/LICENSE.txt.tmp \
+	--authors-file $DIST/AUTHORS.rst.tmp
+	# --line-directives
 
 # Clean up temp files
 rm $DIST/*.tmp
