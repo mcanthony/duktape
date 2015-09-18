@@ -1141,6 +1141,11 @@ Planned
 1.4.0 (XXXX-XX-XX)
 ------------------
 
+* Add rudimentary support for "const" declarations which are treated like
+  "var" declarations (for example, they are writable) except that an
+  initializer is required; this is mainly for compatibility with existing
+  code bases (GH-360)
+
 * Add a debugger Throw notify for errors about to be thrown, and an option
   to automatically pause before an uncaught error is thrown (GH-286, GH-347)
 
