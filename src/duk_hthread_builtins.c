@@ -339,7 +339,11 @@ DUK_INTERNAL void duk_hthread_create_builtin_objects(duk_hthread *thr) {
 				c_func_getter = duk_bi_native_functions[natidx_getter];
 				c_func_setter = duk_bi_native_functions[natidx_setter];
 				duk_push_c_function_noconstruct_noexotic(ctx, c_func_getter, 0);  /* always 0 args */
+#if defined(DUK_USE_NONSTD_SETTER_KEY_ARGUMENT)
+				duk_push_c_function_noconstruct_noexotic(ctx, c_func_setter, 2);  /* always 2 args */
+#else
 				duk_push_c_function_noconstruct_noexotic(ctx, c_func_setter, 1);  /* always 1 arg */
+#endif
 
 				/* XXX: magic for getter/setter? */
 

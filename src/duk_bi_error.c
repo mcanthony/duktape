@@ -330,11 +330,35 @@ DUK_INTERNAL duk_ret_t duk_bi_error_prototype_linenumber_getter(duk_context *ctx
 
 #endif  /* DUK_USE_TRACEBACKS */
 
+/* FIXME: rename */
 DUK_INTERNAL duk_ret_t duk_bi_error_prototype_nop_setter(duk_context *ctx) {
-	/* Attempt to write 'stack', 'fileName', 'lineNumber' is a silent no-op.
-	 * User can use Object.defineProperty() to override this behavior.
+	/* Attempt to write 'stack', 'fileName', 'lineNumber' works as if
+	 * user code called Object.defineProperty() to override this behavior
+	 * so that it's possible to say e.g. "err.fileName = 'dummy'" as one
+	 * might expect: https://github.com/svaarala/duktape/issues/387
 	 */
-	DUK_ASSERT_TOP(ctx, 1);  /* fixed arg count */
+
+#if defined(DUK_USE_NONSTD_SETTER_KEY_ARGUMENT)
+	DUK_ASSERT_TOP(ctx, 2);  /* fixed arg count: value, key (custom) */
+
+	duk_push_this(ctx);
+	duk_dup(ctx, 1);
+	duk_dup(ctx, 0);
+
+	/* [ ... obj key value ] */
+
+	DUK_D(DUK_DPRINT("error setter: %!T %!T %!T",
+	                 duk_get_tval(ctx, -3), duk_get_tval(ctx, -2), duk_get_tval(ctx, -1)));
+
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE |
+	                      DUK_DEFPROP_HAVE_WRITABLE | DUK_DEFPROP_WRITABLE |
+	                      DUK_DEFPROP_HAVE_ENUMERABLE | /*not enumerable*/
+	                      DUK_DEFPROP_HAVE_CONFIGURABLE | DUK_DEFPROP_CONFIGURABLE);
+	return 0;
+#else
+	/* FIXME: nop? could use three separate setters or a polyfill */
+	DUK_ASSERT_TOP(ctx, 1);  /* fixed arg count: value */
 	DUK_UNREF(ctx);
 	return 0;
+#endif
 }
