@@ -484,6 +484,7 @@ struct duk_heaphdr_string {
 		DUK_TVAL_DECREF((thr), &tv__tmp);  /* side effects */ \
 	} while (0)
 
+/* FIXME */
 #if 0  /* XXX: to optimize and measure */
 /* Original idiom but with forced fast refcount macros. */
 #define DUK_TVAL_SET_TVAL_UPDREF_ALT0F(thr,tvptr_dst,tvptr_src) do { \
