@@ -1177,6 +1177,9 @@ Planned
 * Internal performance improvement: rework "effective this" handling for
   better call performance (GH-397)
 
+* Internal performance improvement: handle function self-reference specially
+  to avoid a slow path identifier lookup for self-recursive functions (GH-FIXME)
+
 2.0.0 (XXXX-XX-XX)
 ------------------
 
