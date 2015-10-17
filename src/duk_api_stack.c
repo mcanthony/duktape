@@ -4451,4 +4451,57 @@ DUK_INTERNAL void duk_push_string_funcptr(duk_context *ctx, duk_uint8_t *ptr, du
 	duk_push_lstring(ctx, (const char *) buf, sz * 2);
 }
 
+/*
+ *  Push readable string summarizing duk_tval.  The operation is side effect
+ *  free and will only throw from internal errors (e.g. out of memory).
+ *  There's a sanity length limit for strings, and non-ASCII characters will
+ *  be sanitized.
+ *
+ *  This is used by e.g. property access code to summarize a key/base safely.
+ */
+
+DUK_INTERNAL const char *duk_push_tval_readable(duk_context *ctx, duk_tval *tv) {
+	duk_hthread *thr;
+
+	DUK_ASSERT_CTX_VALID(ctx);
+	thr = (duk_hthread *) ctx;
+	DUK_UNREF(thr);
+
+	/* FIXME: optimize */
+	switch (DUK_TVAL_GET_TAG(tv)) {
+	case DUK_TAG_STRING: {
+		duk_hstring *h = DUK_TVAL_GET_STRING(tv);
+		DUK_ASSERT(h != NULL);
+		/* FIXME: truncate, sanitize */
+		if (DUK_HSTRING_GET_BYTELEN(h) > 32) {
+			duk_push_lstring(ctx, (const char *) DUK_HSTRING_GET_DATA(h), 32);
+			duk_push_string(ctx, "...");
+			duk_concat(ctx, 2);
+		} else {
+			duk_push_hstring(ctx, h);
+		}
+		break;
+	}
+	case DUK_TAG_OBJECT: {
+		duk_hobject *h = DUK_TVAL_GET_OBJECT(tv);
+		DUK_ASSERT(h != NULL);
+		DUK_UNREF(h);
+		duk_push_string(ctx, "[object]");  /* FIXME: class */
+		break;
+	}
+	case DUK_TAG_BUFFER: {
+		duk_hbuffer *h = DUK_TVAL_GET_BUFFER(tv);
+		DUK_ASSERT(h != NULL);
+		duk_push_sprintf(ctx, "[buffer:%ld]", (long) DUK_HBUFFER_GET_SIZE(h));  /* FIXME */
+		break;
+	}
+	default: {
+		duk_push_tval(ctx, tv);
+		break;
+	}
+	}
+
+	return duk_to_string(ctx, -1);
+}
+
 #undef DUK__CHECK_SPACE
