@@ -1151,6 +1151,9 @@ Planned
   value is a register-bound variable which is used and mutated in the rest
   of the expression (GH-381)
 
+* Fix Unix local time offset handling which caused issues at least on RISC
+  OS (GH-406, GH-407)
+
 * Internal performance improvement: rework RETURN opcode handling to avoid
   longjmp() calls, improving performance slightly on ordinary platforms and
   significantly on Emscripten (GH-342, GH-345)
